@@ -6,3 +6,11 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Dados temporários e leads (nunca commitar)
+.tmp/
+!.tmp/.gitkeep
+
+# Credenciais OAuth (Google)
+credentials.json
+token.json

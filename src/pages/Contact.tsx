@@ -1,25 +1,46 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Send, CheckCircle2 } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { LeadData } from '../types';
 
+type SubmitState = 'idle' | 'loading' | 'success' | 'error';
+
 export default function Contact() {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitState, setSubmitState] = useState<SubmitState>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState<Partial<LeadData>>({
     interestType: 'individual'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
-    console.log('Lead captured:', formData);
-    setSubmitted(true);
+    setSubmitState('loading');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Erro ao enviar aplicação.');
+      }
+
+      setSubmitState('success');
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Erro inesperado. Tente novamente.');
+      setSubmitState('error');
+    }
   };
 
-  if (submitted) {
+  if (submitState === 'success') {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-md"
@@ -27,12 +48,12 @@ export default function Contact() {
           <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-bold mb-4">Information Requested</h2>
+          <h2 className="text-3xl font-bold mb-4">Application Received</h2>
           <p className="text-brand-muted mb-8">
             Thank you for your interest in the SME Resilience Toolkit™. An advisor will contact you within 24 hours to discuss your profile and the next certification steps.
           </p>
-          <button 
-            onClick={() => window.location.reload()}
+          <button
+            onClick={() => { setSubmitState('idle'); setFormData({ interestType: 'individual' }); }}
             className="text-brand-accent font-bold hover:underline"
           >
             Back to Home
@@ -51,7 +72,7 @@ export default function Contact() {
             <p className="text-xl text-brand-muted mb-12 leading-relaxed">
               The SME Resilience Portal is a premium environment. We evaluate each application to ensure the methodology is applied by professionals capable of delivering high-impact organizational transformation.
             </p>
-            
+
             <div className="space-y-8">
               <div className="flex gap-6">
                 <div className="w-12 h-12 rounded-xl bg-brand-deepblue text-white flex items-center justify-center flex-shrink-0 font-bold">01</div>
@@ -82,9 +103,9 @@ export default function Contact() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-muted">Full Name</label>
-                  <input 
+                  <input
                     required
-                    type="text" 
+                    type="text"
                     className="w-full px-4 py-3 rounded-xl border border-brand-deepblue/10 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none transition-all"
                     placeholder="John Doe"
                     onChange={e => setFormData({...formData, name: e.target.value})}
@@ -92,9 +113,9 @@ export default function Contact() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-muted">Work Email</label>
-                  <input 
+                  <input
                     required
-                    type="email" 
+                    type="email"
                     className="w-full px-4 py-3 rounded-xl border border-brand-deepblue/10 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none transition-all"
                     placeholder="john@company.com"
                     onChange={e => setFormData({...formData, email: e.target.value})}
@@ -105,9 +126,9 @@ export default function Contact() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-muted">Company / Boutique</label>
-                  <input 
+                  <input
                     required
-                    type="text" 
+                    type="text"
                     className="w-full px-4 py-3 rounded-xl border border-brand-deepblue/10 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none transition-all"
                     placeholder="Acme Consulting"
                     onChange={e => setFormData({...formData, company: e.target.value})}
@@ -115,9 +136,9 @@ export default function Contact() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-muted">Current Role</label>
-                  <input 
+                  <input
                     required
-                    type="text" 
+                    type="text"
                     className="w-full px-4 py-3 rounded-xl border border-brand-deepblue/10 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none transition-all"
                     placeholder="Senior HR Consultant"
                     onChange={e => setFormData({...formData, role: e.target.value})}
@@ -127,9 +148,9 @@ export default function Contact() {
 
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-muted">I am applying as:</label>
-                <select 
+                <select
                   className="w-full px-4 py-3 rounded-xl border border-brand-deepblue/10 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none transition-all appearance-none bg-white"
-                  onChange={e => setFormData({...formData, interestType: e.target.value as any})}
+                  onChange={e => setFormData({...formData, interestType: e.target.value as LeadData['interestType']})}
                 >
                   <option value="individual">Individual Consultant</option>
                   <option value="consultancy">HR Consultancy / Boutique</option>
@@ -141,21 +162,38 @@ export default function Contact() {
 
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-muted">Context / Goals</label>
-                <textarea 
+                <textarea
                   className="w-full px-4 py-3 rounded-xl border border-brand-deepblue/10 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none transition-all min-h-[120px]"
                   placeholder="Tell us about your current practice and what you hope to achieve with the SME Resilience Toolkit™..."
                   onChange={e => setFormData({...formData, context: e.target.value})}
                 ></textarea>
               </div>
 
-              <button 
+              {submitState === 'error' && (
+                <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+                  <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm">{errorMessage}</p>
+                </div>
+              )}
+
+              <button
                 type="submit"
-                className="w-full bg-brand-deepblue text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-blue transition-all flex items-center justify-center gap-2 group"
+                disabled={submitState === 'loading'}
+                className="w-full bg-brand-deepblue text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-blue transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Submit Application
-                <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                {submitState === 'loading' ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Submit Application
+                    <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </>
+                )}
               </button>
-              
+
               <p className="text-[10px] text-brand-muted text-center uppercase tracking-widest">
                 By submitting, you agree to our privacy policy and terms of service.
               </p>
