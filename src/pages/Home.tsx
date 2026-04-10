@@ -159,7 +159,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 className="relative"
               >
                 <img 
-                  src="/founder.png" 
+                  src="/strategic-human/founder.png" 
                   className="rounded-3xl shadow-2xl border border-white/10" 
                   alt="Aline Cristina de Souza - CEO and Founder" 
                 />
