@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion, useMotionValue, useSpring } from 'motion/react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useSpring, useInView } from 'motion/react';
 import { Page } from '../types';
 import {
   ArrowRight, BookOpen, Database, Users, LineChart,
@@ -31,17 +31,22 @@ function useCounter(target: number, duration = 2000) {
 }
 
 function AnimatedStat({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true });
   const { count, start } = useCounter(value, 1800);
+
+  useEffect(() => {
+    if (isInView) start();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInView]);
+
   return (
-    <motion.div
-      onViewportEnter={start}
-      className="text-center"
-    >
+    <div ref={ref} className="text-center">
       <div className="text-4xl lg:text-5xl font-bold text-brand-accent mb-2">
         {count.toLocaleString()}{suffix}
       </div>
       <div className="text-xs font-bold uppercase tracking-widest text-white/60">{label}</div>
-    </motion.div>
+    </div>
   );
 }
 
