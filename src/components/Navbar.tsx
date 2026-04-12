@@ -16,20 +16,23 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
     { label: 'For Consultants', value: 'consultants' },
     { label: 'For Companies', value: 'companies' },
     { label: 'FAQ', value: 'faq' },
+    { label: 'Pricing', value: 'pricing' },
   ];
 
   return (
     <nav className="sticky top-0 z-50 bg-brand-offwhite/90 backdrop-blur-md border-b border-brand-deepblue/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          <div 
+          <div
             className="flex-shrink-0 flex items-center cursor-pointer"
             onClick={() => onNavigate('home')}
           >
-            <span className="text-xl font-display font-bold tracking-tighter text-brand-deepblue leading-none">
-              STRATEGIC HUMAN<br/>
-              <span className="text-brand-accent">SYSTEM & GOVERNANCE LLC</span>
-            </span>
+            <div className="leading-none">
+              <span className="block text-xs font-bold tracking-widest uppercase text-brand-muted">Strategic Human Systems & Governance LLC</span>
+              <span className="block text-lg font-display font-bold tracking-tighter text-brand-deepblue">
+                SME Resilience <span className="text-brand-accent">Academy™</span>
+              </span>
+            </div>
           </div>
 
           {/* Desktop Nav */}
@@ -46,10 +49,10 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
               </button>
             ))}
             <button
-              onClick={() => onNavigate('contact')}
-              className="bg-brand-deepblue text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-blue transition-all flex items-center gap-2 group"
+              onClick={() => onNavigate('pricing')}
+              className="bg-brand-accent text-white px-6 py-2.5 rounded-full text-sm font-bold hover:scale-105 transition-all flex items-center gap-2 group shadow-lg shadow-brand-accent/30"
             >
-              Request Info
+              Get Certified Now
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -83,12 +86,12 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           ))}
           <button
             onClick={() => {
-              onNavigate('contact');
+              onNavigate('pricing');
               setIsOpen(false);
             }}
-            className="block w-full text-center bg-brand-deepblue text-white px-3 py-4 rounded-lg text-base font-semibold"
+            className="block w-full text-center bg-brand-accent text-white px-3 py-4 rounded-lg text-base font-bold"
           >
-            Request Information
+            Get Certified Now
           </button>
         </div>
       )}

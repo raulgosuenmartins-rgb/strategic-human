@@ -1,4 +1,4 @@
-export type Page = 'home' | 'methodology' | 'certification' | 'consultants' | 'companies' | 'faq' | 'contact';
+export type Page = 'home' | 'methodology' | 'certification' | 'consultants' | 'companies' | 'faq' | 'contact' | 'pricing';
 
 export interface LeadData {
   name: string;
