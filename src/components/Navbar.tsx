@@ -1,100 +1,189 @@
 import { Page } from '../types';
-import { Menu, X, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface NavbarProps {
   currentPage: Page;
   onNavigate: (page: Page) => void;
 }
 
+const navItems: { label: string; value: Page }[] = [
+  { label: 'Methodology', value: 'methodology' },
+  { label: 'Certification', value: 'certification' },
+  { label: 'Consultants', value: 'consultants' },
+  { label: 'Companies', value: 'companies' },
+  { label: 'Investment', value: 'pricing' },
+  { label: 'FAQ', value: 'faq' },
+];
+
 export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const navItems: { label: string; value: Page }[] = [
-    { label: 'Methodology', value: 'methodology' },
-    { label: 'Certification', value: 'certification' },
-    { label: 'For Consultants', value: 'consultants' },
-    { label: 'For Companies', value: 'companies' },
-    { label: 'Investment', value: 'pricing' },
-    { label: 'FAQ', value: 'faq' },
-  ];
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // close mobile menu on navigation
+  const navigate = (page: Page) => {
+    onNavigate(page);
+    setIsOpen(false);
+  };
 
   return (
-    <nav className="sticky top-0 z-50 bg-brand-offwhite/90 backdrop-blur-md border-b border-brand-deepblue/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 items-center">
-          <div
-            className="flex-shrink-0 flex items-center cursor-pointer"
-            onClick={() => onNavigate('home')}
-          >
-            <div className="leading-none">
-              <span className="block text-xs font-bold tracking-widest uppercase text-brand-muted">Strategic Human Systems & Governance LLC</span>
-              <span className="block text-lg font-display font-bold tracking-tighter text-brand-deepblue">
-                SME Resilience <span className="text-brand-accent">Academy™</span>
-              </span>
-            </div>
-          </div>
+    <>
+      <motion.nav
+        initial={false}
+        animate={{
+          backgroundColor: scrolled ? 'rgba(253,252,251,0.97)' : 'rgba(253,252,251,0.80)',
+          boxShadow: scrolled ? '0 1px 0 rgba(10,25,47,0.08)' : '0 1px 0 rgba(10,25,47,0.04)',
+        }}
+        transition={{ duration: 0.25 }}
+        className="sticky top-0 z-50 backdrop-blur-md"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-18 py-3">
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.value}
-                onClick={() => onNavigate(item.value)}
-                className={`text-sm font-medium transition-colors hover:text-brand-accent ${
-                  currentPage === item.value ? 'text-brand-accent' : 'text-brand-deepblue/70'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
+            {/* ── Logo ── */}
             <button
-              onClick={() => onNavigate('contact')}
-              className="bg-brand-deepblue text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-brand-blue transition-all flex items-center gap-2 group"
+              onClick={() => navigate('home')}
+              className="flex items-center gap-3 group"
             >
-              Book a Call
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {/* Monogram */}
+              <div className="w-9 h-9 rounded-lg bg-brand-deepblue flex items-center justify-center flex-shrink-0 group-hover:bg-brand-blue transition-colors">
+                <span className="text-white font-display font-bold text-sm tracking-tight">SRA</span>
+              </div>
+              {/* Text */}
+              <div className="leading-none">
+                <span className="block text-base font-display font-bold tracking-tight text-brand-deepblue">
+                  SME Resilience <span className="text-brand-accent">Academy™</span>
+                </span>
+                <span className="block text-[10px] font-medium tracking-wider uppercase text-brand-muted/70 mt-0.5">
+                  Strategic Human Systems & Governance
+                </span>
+              </div>
             </button>
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+            {/* ── Desktop nav ── */}
+            <div className="hidden lg:flex items-center gap-1">
+              {navItems.map((item) => {
+                const active = currentPage === item.value;
+                return (
+                  <button
+                    key={item.value}
+                    onClick={() => navigate(item.value)}
+                    className="relative px-4 py-2 text-sm font-medium rounded-lg transition-colors group"
+                  >
+                    <span className={active ? 'text-brand-deepblue' : 'text-brand-deepblue/55 group-hover:text-brand-deepblue transition-colors'}>
+                      {item.label}
+                    </span>
+                    {active && (
+                      <motion.span
+                        layoutId="nav-indicator"
+                        className="absolute bottom-0.5 left-4 right-4 h-0.5 rounded-full bg-brand-accent"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* ── CTA ── */}
+            <div className="hidden lg:flex items-center gap-3">
+              <button
+                onClick={() => navigate('contact')}
+                className="flex items-center gap-2 bg-brand-deepblue text-white text-sm font-bold px-5 py-2.5 rounded-full hover:bg-brand-blue transition-all group shadow-sm"
+              >
+                Book a Call
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+
+            {/* ── Mobile toggle ── */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-brand-deepblue p-2"
+              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-brand-deepblue/5 transition-colors text-brand-deepblue"
+              aria-label="Toggle menu"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
+
           </div>
         </div>
-      </div>
+      </motion.nav>
 
-      {/* Mobile Nav */}
-      {isOpen && (
-        <div className="md:hidden bg-brand-offwhite border-b border-brand-deepblue/5 px-4 pt-2 pb-6 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.value}
-              onClick={() => {
-                onNavigate(item.value);
-                setIsOpen(false);
-              }}
-              className="block w-full text-left px-3 py-4 text-base font-medium text-brand-deepblue hover:bg-brand-deepblue/5 rounded-lg"
+      {/* ── Mobile menu overlay ── */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-brand-deepblue/20 backdrop-blur-sm lg:hidden"
+              onClick={() => setIsOpen(false)}
+            />
+
+            {/* Drawer */}
+            <motion.div
+              key="drawer"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="fixed top-[72px] left-4 right-4 z-50 lg:hidden bg-white rounded-2xl shadow-2xl shadow-brand-deepblue/15 border border-brand-deepblue/5 overflow-hidden"
             >
-              {item.label}
-            </button>
-          ))}
-          <button
-            onClick={() => {
-              onNavigate('contact');
-              setIsOpen(false);
-            }}
-            className="block w-full text-center bg-brand-deepblue text-white px-3 py-4 rounded-lg text-base font-bold"
-          >
-            Book a Call
-          </button>
-        </div>
-      )}
-    </nav>
+              {/* Nav links */}
+              <div className="p-3">
+                {navItems.map((item, i) => {
+                  const active = currentPage === item.value;
+                  return (
+                    <motion.button
+                      key={item.value}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.04 }}
+                      onClick={() => navigate(item.value)}
+                      className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-left text-sm font-medium transition-colors ${
+                        active
+                          ? 'bg-brand-deepblue text-white'
+                          : 'text-brand-deepblue hover:bg-brand-offwhite'
+                      }`}
+                    >
+                      {item.label}
+                      {active && <span className="w-1.5 h-1.5 rounded-full bg-brand-accent" />}
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              {/* CTA */}
+              <div className="px-3 pb-3">
+                <button
+                  onClick={() => navigate('contact')}
+                  className="w-full flex items-center justify-center gap-2 bg-brand-accent text-white py-4 rounded-xl font-bold text-sm hover:bg-brand-accent/90 transition-colors"
+                >
+                  Book a Discovery Call
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Footer brand */}
+              <div className="px-5 pb-4 pt-1 border-t border-brand-deepblue/5">
+                <p className="text-[10px] text-brand-muted/60 uppercase tracking-widest font-medium">
+                  Strategic Human Systems & Governance LLC
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
