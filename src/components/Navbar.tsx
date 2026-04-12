@@ -15,8 +15,8 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
     { label: 'Certification', value: 'certification' },
     { label: 'For Consultants', value: 'consultants' },
     { label: 'For Companies', value: 'companies' },
+    { label: 'Investment', value: 'pricing' },
     { label: 'FAQ', value: 'faq' },
-    { label: 'Pricing', value: 'pricing' },
   ];
 
   return (
@@ -49,10 +49,10 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
               </button>
             ))}
             <button
-              onClick={() => onNavigate('pricing')}
-              className="bg-brand-accent text-white px-6 py-2.5 rounded-full text-sm font-bold hover:scale-105 transition-all flex items-center gap-2 group shadow-lg shadow-brand-accent/30"
+              onClick={() => onNavigate('contact')}
+              className="bg-brand-deepblue text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-brand-blue transition-all flex items-center gap-2 group"
             >
-              Get Certified Now
+              Book a Call
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -86,12 +86,12 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           ))}
           <button
             onClick={() => {
-              onNavigate('pricing');
+              onNavigate('contact');
               setIsOpen(false);
             }}
-            className="block w-full text-center bg-brand-accent text-white px-3 py-4 rounded-lg text-base font-bold"
+            className="block w-full text-center bg-brand-deepblue text-white px-3 py-4 rounded-lg text-base font-bold"
           >
-            Get Certified Now
+            Book a Call
           </button>
         </div>
       )}

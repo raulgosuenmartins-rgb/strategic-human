@@ -30,3 +30,17 @@
 .glass-card {
   @apply bg-white/80 backdrop-blur-md border border-brand-deepblue/5 shadow-sm;
 }
+
+.hero-gradient {
+  background: linear-gradient(135deg, #FDFCFB 0%, #f5f3f0 50%, #eef2f8 100%);
+}
+
+@keyframes shimmer-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.04; }
+  33% { transform: translate(20px, -15px) scale(1.05); opacity: 0.07; }
+  66% { transform: translate(-10px, 20px) scale(0.98); opacity: 0.05; }
+}
+
+.bg-animated-orb {
+  animation: shimmer-drift 12s ease-in-out infinite;
+}

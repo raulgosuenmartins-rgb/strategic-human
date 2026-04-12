@@ -1,346 +1,304 @@
-import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion, useMotionValue, useSpring } from 'motion/react';
 import { Page } from '../types';
 import {
-  ArrowRight, ShieldCheck, BarChart3, Users, Award,
-  TrendingUp, AlertTriangle, DollarSign, CheckCircle,
-  Zap, Target, BookOpen, Database, LineChart, Building2
+  ArrowRight, BookOpen, Database, Users, LineChart,
+  DollarSign, Award, ChevronDown
 } from 'lucide-react';
 
 interface HomeProps {
   onNavigate: (page: Page) => void;
 }
 
-function CounterStat({ value, label }: { value: string; label: string }) {
+function useCounter(target: number, duration = 2000) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!started) return;
+    const startTime = performance.now();
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [started, target, duration]);
+
+  return { count, start: () => setStarted(true) };
+}
+
+function AnimatedStat({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const { count, start } = useCounter(value, 1800);
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      onViewportEnter={start}
       className="text-center"
     >
-      <div className="text-4xl lg:text-5xl font-bold text-brand-accent mb-2">{value}</div>
+      <div className="text-4xl lg:text-5xl font-bold text-brand-accent mb-2">
+        {count.toLocaleString()}{suffix}
+      </div>
       <div className="text-xs font-bold uppercase tracking-widest text-white/60">{label}</div>
     </motion.div>
   );
 }
 
+const modules = [
+  { icon: <BookOpen className="w-5 h-5" />, title: 'Scientific Foundations', desc: 'An interdisciplinary framework built to deliver boardroom-ready insights — not opinions.' },
+  { icon: <Database className="w-5 h-5" />, title: 'Analytical Governance', desc: 'Proprietary quantitative indices that give every engagement a mathematically traceable outcome.' },
+  { icon: <Users className="w-5 h-5" />, title: 'Human Capital & Inclusion', desc: 'A structured approach that converts workforce diversity into measurable organizational strength.' },
+  { icon: <LineChart className="w-5 h-5" />, title: 'Monitoring & Intelligence', desc: 'Detect disruption before it becomes a crisis — with precision instruments, not surveys.' },
+  { icon: <DollarSign className="w-5 h-5" />, title: 'Fiscal Impact Modeling', desc: 'Translate every HR intervention into an auditable financial ROI that institutions can publish.' },
+  { icon: <Award className="w-5 h-5" />, title: 'Certification & Licensing', desc: 'A three-tier practitioner structure that defines exactly what you can deliver — and to whom.' },
+];
+
+const levels = [
+  {
+    level: 'Level I',
+    title: 'Applied Consultant',
+    tagline: 'Master the diagnostic fundamentals.',
+    outcomes: [
+      'Conduct structured organizational resilience assessments',
+      'Deliver executive-grade resilience reports to SME clients',
+      'Position your practice around a system, not a service',
+    ],
+  },
+  {
+    level: 'Level II',
+    title: 'Strategist Consultant',
+    tagline: 'Command complex, high-stakes engagements.',
+    outcomes: [
+      'Lead board-level resilience strategy with predictive modeling',
+      'Access institutional markets — government agencies and nonprofits',
+      'Deliver fiscal impact documentation no generalist can replicate',
+    ],
+    featured: true,
+  },
+  {
+    level: 'Level III',
+    title: 'Accredited Instructor',
+    tagline: 'Build your own certified practitioner network.',
+    outcomes: [
+      'Train and license other certified practitioners under your authority',
+      'Design and deliver corporate certification cohorts',
+      'Operate institutional licensing programs at scale',
+    ],
+  },
+];
+
 export default function Home({ onNavigate }: HomeProps) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+
+  const handleMouseMove = (e: { clientX: number; clientY: number; currentTarget: HTMLDivElement }) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mouseX.set((e.clientX - rect.left - rect.width / 2) * 0.02);
+    mouseY.set((e.clientY - rect.top - rect.height / 2) * 0.02);
+  };
+
   return (
     <div className="overflow-hidden">
 
       {/* ── HERO ── */}
-      <section className="relative pt-20 pb-24 lg:pt-28 lg:pb-36 bg-brand-offwhite">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section
+        className="relative min-h-[92vh] flex items-center pt-8 pb-16 overflow-hidden hero-gradient"
+        onMouseMove={handleMouseMove}
+      >
+        {/* Animated background orbs */}
+        <motion.div
+          style={{ x: springX, y: springY }}
+          className="absolute top-20 right-0 w-[600px] h-[600px] rounded-full bg-brand-accent/5 blur-3xl pointer-events-none"
+        />
+        <motion.div
+          style={{ x: springX, y: springY }}
+          className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-brand-blue/30 blur-3xl pointer-events-none"
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
 
             {/* Left: copy */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/10 text-brand-accent text-xs font-bold uppercase tracking-widest mb-6">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                The Only Certification That Speaks the Language of Money
-              </div>
-
-              <h1 className="text-5xl lg:text-7xl font-bold leading-[1.05] mb-6">
-                Your Clients Are Losing{' '}
-                <span className="text-brand-accent italic">$32,190</span>{' '}
-                Per Worker Per Year.{' '}
-                <span className="text-brand-deepblue/50">Can You Prove It?</span>
-              </h1>
-
-              <p className="text-xl text-brand-muted mb-4 max-w-xl leading-relaxed">
-                Stop competing on rate. Deploy the SME Resilience Toolkit™ — the only
-                proprietary, science-backed methodology for SME organizational resilience in
-                the United States. Charge $18,000 engagements. Deliver a score.
-              </p>
-
-              {/* Trust strip */}
-              <div className="flex flex-wrap gap-3 mb-8 text-xs font-bold uppercase tracking-wider text-brand-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-brand-accent" /> HRCI-Eligible Credits</span>
-                <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-brand-accent" /> 3 Certification Levels</span>
-                <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-brand-accent" /> 10 Proprietary Indices</span>
-                <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-brand-accent" /> U.S. SME Focused</span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => onNavigate('pricing')}
-                  className="bg-brand-accent text-white px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-brand-accent/40"
-                >
-                  Get Certified Now
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => onNavigate('methodology')}
-                  className="bg-white text-brand-deepblue border-2 border-brand-deepblue/20 px-10 py-5 rounded-full font-bold text-lg hover:border-brand-deepblue/60 transition-all"
-                >
-                  See the Methodology
-                </button>
-              </div>
-            </motion.div>
-
-            {/* Right: mosaic grid */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="grid grid-cols-2 gap-4"
-            >
-              {/* Top-left: navy brand */}
-              <div className="bg-brand-deepblue rounded-3xl p-8 text-white flex flex-col justify-between min-h-[180px]">
-                <div className="text-xs font-bold uppercase tracking-widest opacity-60 mb-3">SME Resilience Academy™</div>
-                <div>
-                  <div className="text-3xl font-bold text-brand-accent mb-1">ORI™</div>
-                  <div className="text-sm opacity-70">Organizational Resilience Index</div>
-                </div>
-              </div>
-
-              {/* Top-right: coral stat */}
-              <div className="bg-brand-accent rounded-3xl p-8 text-white flex flex-col justify-between min-h-[180px]">
-                <div className="text-xs font-bold uppercase tracking-widest opacity-70 mb-3">Net Fiscal Gain / Worker / Year</div>
-                <div>
-                  <div className="text-4xl font-bold mb-1">$32,190</div>
-                  <div className="text-sm opacity-80">Documented. Auditable. Yours to deliver.</div>
-                </div>
-              </div>
-
-              {/* Bottom-left: light */}
-              <div className="bg-white border border-brand-deepblue/10 rounded-3xl p-8 flex flex-col justify-between min-h-[180px]">
-                <div className="text-xs font-bold uppercase tracking-widest text-brand-muted mb-3">Feature Stack</div>
-                <div className="space-y-2">
-                  {['ORI™ Diagnostic', 'SRZ™ Failure Predictor', 'NFG™ Fiscal Impact'].map(f => (
-                    <div key={f} className="flex items-center gap-2 text-sm font-medium">
-                      <div className="w-2 h-2 rounded-full bg-brand-accent" />
-                      {f}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bottom-right: blue */}
-              <div className="bg-brand-blue rounded-3xl p-8 text-white flex flex-col justify-between min-h-[180px]">
-                <div className="text-xs font-bold uppercase tracking-widest opacity-60 mb-3">Practitioner Revenue</div>
-                <div>
-                  <div className="text-3xl font-bold text-brand-accent mb-1">$200K+</div>
-                  <div className="text-sm opacity-70">Annual income from Toolkit ecosystem alone</div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CRISIS / PROBLEM SECTION ── */}
-      <section className="py-24 bg-brand-deepblue text-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">The Problem Nobody Is Solving</div>
-            <h2 className="text-4xl lg:text-6xl font-bold leading-tight">
-              The U.S. HR Consulting Market<br/>
-              Is Broken. <span className="text-brand-accent">Here's the Data.</span>
-            </h2>
-          </div>
-
-          {/* Big stats grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            {[
-              { stat: '$53.8B', label: 'HR Consulting Market by 2030', source: 'Grand View Research' },
-              { stat: '200%', label: 'Annual Salary Lost Per Leadership Departure', source: 'Gallup 2026' },
-              { stat: '60%', label: 'SMBs Unprepared for Operational Disruption', source: 'U.S. Chamber 2024' },
-              { stat: '$32,190', label: 'Annual Public Savings Per Reinserted Worker', source: 'NFG™ Model' },
-            ].map((item, i) => (
+            <div className="lg:col-span-7">
               <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7 }}
               >
-                <div className="text-4xl lg:text-5xl font-bold text-brand-accent mb-3">{item.stat}</div>
-                <div className="text-sm font-semibold text-white/80 mb-2 leading-snug">{item.label}</div>
-                <div className="text-xs text-white/40 uppercase tracking-widest">{item.source}</div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Aggressive sub-headlines */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[
-              {
-                icon: <AlertTriangle className="w-6 h-6 text-brand-accent" />,
-                text: '"Your SHRM cert got you in the door. It will not get you to $300K."'
-              },
-              {
-                icon: <DollarSign className="w-6 h-6 text-brand-accent" />,
-                text: '"The average HR consultant charges $120/hr. A certified Toolkit practitioner closes $18,000 engagements. Same market. Different methodology."'
-              },
-              {
-                icon: <AlertTriangle className="w-6 h-6 text-brand-accent" />,
-                text: '"Your client just lost their third operations manager in 90 days. Can you put a dollar figure on that? No? Then someone else will."'
-              },
-              {
-                icon: <TrendingUp className="w-6 h-6 text-brand-accent" />,
-                text: '"60% of your clients are one bad quarter away from collapse. Your job is to prove it before they collapse."'
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex gap-4 items-start bg-white/5 border border-white/10 rounded-2xl p-6"
-              >
-                <div className="flex-shrink-0 mt-0.5">{item.icon}</div>
-                <p className="text-lg font-medium text-white/90 italic leading-relaxed">{item.text}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── METHODOLOGY — 6 MODULES ── */}
-      <section className="py-24 bg-brand-offwhite">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">The System</div>
-            <h2 className="text-4xl lg:text-6xl font-bold mb-6">6 Modules. 10 Proprietary Indices. Zero Generic Consulting.</h2>
-            <p className="text-xl text-brand-muted leading-relaxed">
-              The SME Resilience Toolkit™ is not a checklist. It is a mathematical system with a proprietary formula:
-              <span className="font-bold text-brand-deepblue"> Resilience = f(Financial Stability + Operational Predictability + Human Sustainability)</span>
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {[
-              {
-                num: '01',
-                icon: <BookOpen className="w-6 h-6" />,
-                title: 'Scientific Foundations',
-                desc: 'Interdisciplinary framework integrating Applied Mathematics, Organizational Psychology, and Process Engineering. Three-vector model gives every engagement a theoretical backbone that boards and investors respect — not a checklist, a formula.',
-              },
-              {
-                num: '02',
-                icon: <Database className="w-6 h-6" />,
-                title: 'Analytical Governance & Mathematical Modeling',
-                desc: 'Ten proprietary indices including ORI™ (composite score 0–100 with Bayesian dynamic weighting), SRZ™ predictive failure model, RSC, TRC, ICR, CVO, CSC, FCE™, NFG™, FCC™. Every recommendation is mathematically traceable.',
-              },
-              {
-                num: '03',
-                icon: <Users className="w-6 h-6" />,
-                title: 'Human Capital & Productive Inclusion',
-                desc: '6-step Inclusive Recruitment Protocol, Retention-as-Organizational-Engineering framework, and Cognitive Load Management system. Converts underutilized workforce segments into high-stability assets.',
-              },
-              {
-                num: '04',
-                icon: <LineChart className="w-6 h-6" />,
-                title: 'Monitoring & Organizational Intelligence',
-                desc: 'Multidimensional Resilience Dashboard integrating financial, operational, and human indicators. Early burnout and climate volatility detection. Intervention before rupture — not after.',
-              },
-              {
-                num: '05',
-                icon: <DollarSign className="w-6 h-6" />,
-                title: 'Fiscal Impact Model (FCE™ / NFG™)',
-                desc: 'Net Fiscal Gain model documenting $20,910–$32,190 in public savings per reinserted worker per year. The only HR consulting model designed for institutional fiscal documentation. Monte Carlo validated.',
-              },
-              {
-                num: '06',
-                icon: <Award className="w-6 h-6" />,
-                title: 'Certification & Licensing Structure',
-                desc: 'Three practitioner levels with defined authorization scopes. Official Six-Step Application Protocol. Code of Methodological Integrity. Non-exclusive, non-transferable methodology license.',
-              },
-            ].map((mod, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="bg-white border border-brand-deepblue/5 rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-4xl font-bold text-brand-deepblue/10 font-display">{mod.num}</span>
-                  <div className="w-10 h-10 rounded-lg bg-brand-accent/10 text-brand-accent flex items-center justify-center">
-                    {mod.icon}
-                  </div>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-xs font-bold uppercase tracking-widest mb-8">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" />
+                  U.S. Market Exclusive — SME Resilience Academy™
                 </div>
-                <h3 className="text-lg font-bold mb-3">{mod.title}</h3>
-                <p className="text-brand-muted text-sm leading-relaxed">{mod.desc}</p>
-              </motion.div>
-            ))}
-          </div>
 
-          <div className="text-center">
-            <button
-              onClick={() => onNavigate('methodology')}
-              className="bg-brand-deepblue text-white px-10 py-4 rounded-full font-bold hover:bg-brand-blue transition-all inline-flex items-center gap-2"
-            >
-              Explore Full Methodology <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </section>
+                <h1 className="text-6xl lg:text-8xl font-bold leading-[1] mb-8 text-brand-deepblue">
+                  The System That Turns HR Into a Language{' '}
+                  <span className="text-brand-accent italic">CEOs Understand.</span>
+                </h1>
 
-      {/* ── 10 PROPRIETARY INDICES ── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-            <div className="lg:sticky lg:top-32">
-              <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">Proprietary IP</div>
-              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-                10 Indices No Generalist<br/>Consultant Can Replicate.
-              </h2>
-              <p className="text-lg text-brand-muted leading-relaxed mb-8">
-                These are not borrowed frameworks. Every index below is proprietary to the
-                SME Resilience Toolkit™. Deploying them in client work requires a valid
-                certification license — period.
-              </p>
-              <div className="bg-brand-deepblue text-white rounded-2xl p-8">
-                <div className="text-brand-accent font-bold uppercase tracking-widest text-xs mb-4">The Opening Number</div>
-                <p className="text-white/90 text-lg leading-relaxed italic">
-                  "Your current ORI™ score is 41 — Vulnerable. Here is your 90-day stabilization plan.
-                  Every month we delay, you burn $27,500 in preventable turnover cost."
+                <p className="text-xl text-brand-muted mb-10 max-w-2xl leading-relaxed">
+                  A proprietary, science-backed certification that equips HR professionals
+                  with a defensible methodology — complete with quantitative indices,
+                  fiscal impact models, and a licensed delivery framework available
+                  nowhere else in the United States.
                 </p>
-                <p className="text-white/50 text-sm mt-4">→ This is the conversation a certified practitioner has. Generic consultants cannot have it.</p>
-              </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={() => onNavigate('methodology')}
+                    className="bg-brand-deepblue text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-brand-blue transition-all flex items-center justify-center gap-2 shadow-2xl shadow-brand-deepblue/30"
+                  >
+                    Discover the Methodology
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => onNavigate('contact')}
+                    className="bg-white text-brand-deepblue border-2 border-brand-deepblue/15 px-10 py-5 rounded-full font-bold text-lg hover:border-brand-deepblue/40 transition-all"
+                  >
+                    Book a Consultation
+                  </button>
+                </div>
+              </motion.div>
             </div>
 
-            <div className="space-y-4">
+            {/* Right: floating credential card */}
+            <div className="hidden lg:flex lg:col-span-5 items-center justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="relative w-full max-w-sm"
+              >
+                {/* Main card */}
+                <div className="bg-brand-deepblue rounded-[2.5rem] p-10 text-white shadow-2xl shadow-brand-deepblue/40">
+                  <div className="text-xs font-bold uppercase tracking-widest text-white/50 mb-6">SME Resilience Academy™</div>
+                  <div className="text-5xl font-bold text-brand-accent mb-3">ORI™</div>
+                  <div className="text-white/70 text-sm leading-relaxed mb-8">
+                    The Organizational Resilience Index — a single composite score that gives
+                    every client a trackable, board-reportable number.
+                  </div>
+                  <div className="border-t border-white/10 pt-6 space-y-3">
+                    {['10 Proprietary Indices', '3 Certification Levels', 'Institutional-Grade Fiscal Models'].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-accent" />
+                        <span className="text-white/70">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Floating badge */}
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute -top-6 -right-6 bg-brand-accent text-white rounded-2xl px-5 py-3 shadow-xl text-sm font-bold"
+                >
+                  U.S. SME Exclusive
+                </motion.div>
+
+                {/* Floating stat */}
+                <motion.div
+                  animate={{ y: [0, 8, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                  className="absolute -bottom-6 -left-6 bg-white rounded-2xl px-5 py-4 shadow-xl border border-brand-deepblue/5"
+                >
+                  <div className="text-xs font-bold uppercase tracking-widest text-brand-muted mb-1">Market Addressable</div>
+                  <div className="text-2xl font-bold text-brand-deepblue">33M+ SMEs</div>
+                </motion.div>
+              </motion.div>
+            </div>
+
+          </div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-brand-muted/50 cursor-pointer"
+            onClick={() => window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' })}
+          >
+            <span className="text-xs uppercase tracking-widest">Explore</span>
+            <ChevronDown className="w-5 h-5" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── SOCIAL PROOF STRIP ── */}
+      <section className="py-8 bg-brand-deepblue border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <AnimatedStat value={33} suffix="M+" label="U.S. SMEs Addressable" />
+            <AnimatedStat value={3} suffix="" label="Certification Levels" />
+            <AnimatedStat value={10} suffix="" label="Proprietary Indices" />
+            <AnimatedStat value={6} suffix="" label="Curriculum Modules" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── THE GAP ── */}
+      <section className="py-32 lg:py-40 bg-brand-offwhite">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">The Problem</div>
+              <h2 className="text-4xl lg:text-6xl font-bold mb-8 leading-tight">
+                Most HR consultants compete on{' '}
+                <span className="text-brand-accent italic">price.</span>{' '}
+                Not on systems.
+              </h2>
+              <p className="text-xl text-brand-muted leading-relaxed mb-6">
+                Without a proprietary methodology, every consultant looks the same to a client.
+                Same certifications. Same frameworks. Same proposals. The only differentiator
+                becomes the hourly rate — and that race has only one direction.
+              </p>
+              <p className="text-xl text-brand-muted leading-relaxed">
+                The SME Resilience Academy™ breaks this cycle by giving practitioners a
+                system — with its own indices, its own measurable output, and its own
+                licensed brand — that no generalist can replicate.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 gap-6">
               {[
-                { abbr: 'ORI™', name: 'Organizational Resilience Index', formula: 'ORI = wF·F + wO·O + wW·W (Bayesian weights, sector-adjusted)', range: '0–100 (5 tiers: Highly Resilient to Critical Risk)', level: 'I+' },
-                { abbr: 'RSC', name: 'Cash Resilience Index', formula: 'RSC = (Cash + Net Receivables + Available Credit) / 3-Mo Burn Rate', range: '<3 Critical | 3–6 Watch | ≥6 Resilient (months)', level: 'I+' },
-                { abbr: 'TRC', name: 'Cost Rigidity Rate', formula: 'TRC = Committed Fixed Costs / Total Costs', range: 'Higher = reduced shock absorption', level: 'I+' },
-                { abbr: 'ICR', name: 'Revenue Concentration Index (HHI)', formula: 'ICR = Σ(rᵢ/R)² — Herfindahl-Hirschman Index', range: '<0.10 Healthy | 0.10–0.25 Moderate | >0.25 Critical', level: 'I+' },
-                { abbr: 'CVO', name: 'Organizational Volatility Coefficient', formula: 'CVO = σ/μ across financial, operational, and workforce dimensions', range: '<0.10 Stable → >0.50 Critical', level: 'I+' },
-                { abbr: 'CSC', name: 'Cost of Staff Replacement', formula: 'CSC = Recruitment + Vacancy + Productivity Loss + Training + 0.30×Salary×(Tenure/Avg.Tenure)', range: '$ per departure by role tier', level: 'I+' },
-                { abbr: 'SRZ™', name: 'SME Resilience Z-Score (Predictive Failure)', formula: 'SRZ = β₀ + β₁·RSC + β₂·RVI + β₃·ICR + β₄·IEFT + β₅·SROP', range: 'P(failure) 12/24/36 months | AUC-ROC >0.75', level: 'II+' },
-                { abbr: 'FCE™', name: 'Fiscal Conversion Effect', formula: 'FCE = ΔTax Revenue + ΔUI Savings + ΔProductivity + Multiplier Effect', range: '$10K–$18K avoided transfers + $5K–$9K new tax revenue', level: 'II+' },
-                { abbr: 'NFG™', name: 'Net Fiscal Gain', formula: 'NFG = (FCE_total − Intervention Cost) / Intervention Cost', range: '$20,910–$32,190/worker/year | Monte Carlo P(NFG>0) >95%', level: 'II+' },
-                { abbr: 'FCC™', name: 'Fiscal Conversion Coefficient', formula: 'FCC = Employment Retention Rate × Average Taxable Income (sector/region calibrated)', range: 'Sector- and region-specific multiplier', level: 'II+' },
-              ].map((idx, i) => (
+                {
+                  before: 'Competing on hourly rate',
+                  after: 'Delivering a proprietary diagnostic score',
+                },
+                {
+                  before: 'Qualitative reports with soft recommendations',
+                  after: 'Quantitative resilience indices with mathematical traceability',
+                },
+                {
+                  before: 'No defensible differentiation in proposals',
+                  after: 'A licensed methodology no competitor can copy',
+                },
+              ].map((item, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                  className="bg-brand-offwhite border border-brand-deepblue/5 rounded-xl p-5"
+                  transition={{ delay: i * 0.12 }}
+                  className="bg-white rounded-2xl overflow-hidden border border-brand-deepblue/5 shadow-sm"
                 >
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-brand-deepblue font-bold text-lg font-display">{idx.abbr}</span>
-                      <span className="text-sm font-medium text-brand-deepblue/70">{idx.name}</span>
+                  <div className="grid grid-cols-2">
+                    <div className="p-6 bg-brand-deepblue/3 border-r border-brand-deepblue/5">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-brand-muted mb-2">Before</div>
+                      <p className="text-sm text-brand-muted leading-relaxed">{item.before}</p>
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0 ${idx.level === 'I+' ? 'bg-brand-deepblue/10 text-brand-deepblue' : 'bg-brand-accent/10 text-brand-accent'}`}>
-                      Level {idx.level}
-                    </span>
+                    <div className="p-6 bg-brand-accent/3">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-brand-accent mb-2">After</div>
+                      <p className="text-sm font-semibold text-brand-deepblue leading-relaxed">{item.after}</p>
+                    </div>
                   </div>
-                  <div className="font-mono text-xs text-brand-muted bg-white border border-brand-deepblue/5 rounded-lg px-3 py-2 mb-2">{idx.formula}</div>
-                  <div className="text-xs text-brand-muted">{idx.range}</div>
                 </motion.div>
               ))}
             </div>
@@ -348,138 +306,151 @@ export default function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
 
-      {/* ── ROI / INCOME PROJECTIONS ── */}
-      <section className="py-24 bg-brand-deepblue text-white">
+      {/* ── THE TOOLKIT — 6 MODULES ── */}
+      <section className="py-32 lg:py-40 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">The Business Case</div>
+          <div className="text-center max-w-2xl mx-auto mb-20">
+            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">The System</div>
             <h2 className="text-4xl lg:text-6xl font-bold mb-6">
-              Level I enrollment pays for itself<br/>in a single SME engagement.
+              Six Modules.<br/>One Complete System.
             </h2>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              Most practitioners complete their first Toolkit engagement within 60 days of certification.
+            <p className="text-xl text-brand-muted leading-relaxed">
+              The SME Resilience Toolkit™ is not a checklist or a framework borrowed from
+              existing certifications. It is a proprietary architecture built from the ground up
+              for the U.S. SME market.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Consultant income table */}
-            <div>
-              <h3 className="text-xl font-bold text-brand-accent uppercase tracking-widest mb-6">Consultant Income Projections</h3>
-              <div className="space-y-3">
-                {[
-                  { scenario: 'Level I — 3 SME clients/year', revenue: '$22,500', note: 'incremental from one new service line' },
-                  { scenario: 'Level I — 8 SME clients/year', revenue: '$64,000', note: 'replaces all hourly work' },
-                  { scenario: 'Level II — 4 engagements/year', revenue: '$88,000', note: 'incremental' },
-                  { scenario: 'Level II — 6 engagements/year', revenue: '$150,000', note: 'full Toolkit-based practice possible' },
-                  { scenario: 'Level III — 2 corporate cohorts', revenue: '$130,000', note: 'new revenue channel' },
-                  { scenario: 'Combined L1+L2+L3 practice', revenue: '$200K–$350K+', note: 'from Toolkit ecosystem alone', highlight: true },
-                ].map((row, i) => (
-                  <div key={i} className={`flex items-center justify-between p-4 rounded-xl ${row.highlight ? 'bg-brand-accent text-white' : 'bg-white/5 border border-white/10'}`}>
-                    <div>
-                      <div className="font-semibold text-sm">{row.scenario}</div>
-                      <div className={`text-xs mt-0.5 ${row.highlight ? 'text-white/80' : 'text-white/50'}`}>{row.note}</div>
-                    </div>
-                    <div className="text-xl font-bold flex-shrink-0 ml-4">{row.revenue}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {modules.map((mod, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                whileHover={{ y: -6, boxShadow: '0 20px 60px -10px rgba(10,25,47,0.12)' }}
+                className="group bg-brand-offwhite border border-brand-deepblue/5 rounded-2xl p-8 cursor-default transition-all duration-300"
+              >
+                <div className="w-12 h-12 rounded-xl bg-brand-deepblue/5 text-brand-accent flex items-center justify-center mb-6 group-hover:bg-brand-accent group-hover:text-white transition-all duration-300">
+                  {mod.icon}
+                </div>
+                <div className="text-3xl font-bold text-brand-deepblue/8 font-display mb-2 select-none">
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <h3 className="text-xl font-bold mb-3">{mod.title}</h3>
+                <p className="text-brand-muted text-sm leading-relaxed">{mod.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-14">
+            <button
+              onClick={() => onNavigate('methodology')}
+              className="inline-flex items-center gap-2 text-brand-deepblue font-bold hover:text-brand-accent transition-colors group"
+            >
+              Explore the full methodology
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CERTIFICATION PATHS ── */}
+      <section className="py-32 lg:py-40 bg-brand-deepblue text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-20">
+            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">Certification</div>
+            <h2 className="text-4xl lg:text-6xl font-bold mb-6">
+              Three Levels.<br/>One Ecosystem.
+            </h2>
+            <p className="text-xl text-white/60 leading-relaxed">
+              Each level expands your authorization scope and your fee ceiling.
+              The pathway is linear. The growth is exponential.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {levels.map((lvl, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12 }}
+                whileHover={{ y: -8 }}
+                className={`rounded-[2.5rem] overflow-hidden flex flex-col transition-all duration-300 ${
+                  lvl.featured
+                    ? 'bg-brand-accent ring-2 ring-brand-accent/50 shadow-2xl shadow-brand-accent/20'
+                    : 'bg-white/5 border border-white/10'
+                }`}
+              >
+                {lvl.featured && (
+                  <div className="bg-white/20 text-center text-xs font-bold uppercase tracking-widest py-2.5 text-white">
+                    Most Sought After
                   </div>
-                ))}
-              </div>
-            </div>
+                )}
+                <div className="p-10 flex-grow flex flex-col">
+                  <div className="text-xs font-bold uppercase tracking-widest opacity-60 mb-2">{lvl.level}</div>
+                  <h3 className="text-2xl font-bold mb-2">{lvl.title}</h3>
+                  <p className={`text-sm italic mb-8 ${lvl.featured ? 'text-white/80' : 'text-white/50'}`}>{lvl.tagline}</p>
 
-            {/* NFG Institutional table */}
-            <div>
-              <h3 className="text-xl font-bold text-brand-accent uppercase tracking-widest mb-6">Institutional Fiscal Impact (NFG™)</h3>
-              <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left px-5 py-4 text-white/60 font-bold uppercase tracking-wider text-xs">Workers Reinserted</th>
-                      <th className="text-right px-5 py-4 text-white/60 font-bold uppercase tracking-wider text-xs">Conservative</th>
-                      <th className="text-right px-5 py-4 text-brand-accent font-bold uppercase tracking-wider text-xs">Optimistic</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { workers: '100 workers', conservative: '$2,091,000', optimistic: '$3,219,000' },
-                      { workers: '500 workers', conservative: '$10,455,000', optimistic: '$16,095,000' },
-                      { workers: '1,000 workers', conservative: '$20,910,000', optimistic: '$32,190,000' },
-                      { workers: '5,000 workers', conservative: '$104,550,000', optimistic: '$160,950,000' },
-                      { workers: '10,000 workers', conservative: '$209,100,000', optimistic: '$321,900,000' },
-                    ].map((row, i) => (
-                      <tr key={i} className="border-b border-white/5 last:border-0">
-                        <td className="px-5 py-4 font-medium">{row.workers}</td>
-                        <td className="px-5 py-4 text-right text-white/70">{row.conservative}</td>
-                        <td className="px-5 py-4 text-right text-brand-accent font-bold">{row.optimistic}</td>
-                      </tr>
+                  <ul className="space-y-4 flex-grow">
+                    {lvl.outcomes.map((outcome, j) => (
+                      <li key={j} className={`flex items-start gap-3 text-sm leading-relaxed ${lvl.featured ? 'text-white/90' : 'text-white/60'}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${lvl.featured ? 'bg-white' : 'bg-brand-accent'}`} />
+                        {outcome}
+                      </li>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="text-xs text-white/40 mt-4 leading-relaxed">
-                ⚠ Fiscal estimates derived from the NFG™ model, calibrated against USDA/ERS, ACF/HHS, CMS, DOL, HUD, and IRS datasets. Monte Carlo validated: P(NFG &gt; 0) &gt; 95% across 10,000 iterations.
-              </p>
-            </div>
+                  </ul>
+
+                  <button
+                    onClick={() => onNavigate('certification')}
+                    className={`mt-10 w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all
+                      ${lvl.featured
+                        ? 'bg-white text-brand-accent hover:bg-white/90'
+                        : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+                      }`}
+                  >
+                    Learn About {lvl.level}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF COUNTER STRIP ── */}
-      <section className="py-16 bg-brand-accent">
+      {/* ── WHO THIS IS FOR ── */}
+      <section className="py-32 lg:py-40 bg-brand-offwhite">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <CounterStat value="500+" label="Certified Practitioners (Year 1 Target)" />
-            <CounterStat value="33M+" label="U.S. SMBs Addressable Market" />
-            <CounterStat value="10" label="Proprietary Indices" />
-            <CounterStat value="$53.8B" label="HR Consulting Market by 2030" />
+          <div className="text-center mb-20">
+            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">Audience</div>
+            <h2 className="text-4xl lg:text-5xl font-bold">Three Markets. One Proprietary System.</h2>
           </div>
-        </div>
-      </section>
 
-      {/* ── FOR WHOM ── */}
-      <section className="py-24 bg-brand-offwhite">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">Who This Is For</div>
-            <h2 className="text-4xl lg:text-5xl font-bold">Three Markets. One System.</h2>
-          </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: <Users className="w-8 h-8" />,
-                label: 'HR Consultants & Advisors',
-                headline: 'Stop competing on price. Start delivering a score.',
-                points: [
-                  'Proprietary IP that no competitor can replicate',
-                  'Justify $5,000–$35,000 project fees instantly',
-                  'Repeatable, branded consulting product',
-                  'Path from $120/hr to $18,000 engagements',
-                ],
-                cta: 'Get Certified',
-                page: 'certification' as Page,
+                emoji: '👤',
+                title: 'HR Consultants & Advisors',
+                desc: 'You have the expertise. The Toolkit gives you the system — and the language to charge for it at a level your SHRM credentials alone cannot justify.',
+                cta: 'For Consultants',
+                page: 'consultants' as Page,
               },
               {
-                icon: <Building2 className="w-8 h-8" />,
-                label: 'SME Executives & HR Directors',
-                headline: 'Stop managing people. Start governing metrics.',
-                points: [
-                  'ORI™ score suitable for board-level reporting',
-                  'SRZ™ predicts failure before it happens',
-                  'CSC converts departures into CFO line items',
-                  'Measurable before/after resilience scores',
-                ],
-                cta: 'Deploy for My Company',
+                emoji: '🏢',
+                title: 'SME Executives & HR Directors',
+                desc: 'Your board demands measurable outcomes, not sentiment reports. A certified Toolkit practitioner delivers a resilience score — and a plan to improve it.',
+                cta: 'For Companies',
                 page: 'companies' as Page,
               },
               {
-                icon: <Target className="w-8 h-8" />,
-                label: 'Government & Workforce Agencies',
-                headline: 'Document fiscal ROI with institutional-grade precision.',
-                points: [
-                  'NFG™: $20,910–$32,190 documented per worker/year',
-                  'FCE™ decomposes into 4 independently auditable channels',
-                  'FCC™ calibrated by sector and region',
-                  'Defensible for federal procurement and grant reporting',
-                ],
-                cta: 'Contact for Licensing',
+                emoji: '🏛',
+                title: 'Government & Workforce Agencies',
+                desc: 'Document the fiscal ROI of workforce reinsertion programs with a model calibrated against federal datasets — auditable, publishable, procurement-defensible.',
+                cta: 'For Institutions',
                 page: 'contact' as Page,
               },
             ].map((audience, i) => (
@@ -491,24 +462,15 @@ export default function Home({ onNavigate }: HomeProps) {
                 transition={{ delay: i * 0.1 }}
                 className="bg-white border border-brand-deepblue/5 rounded-3xl p-10 shadow-sm flex flex-col"
               >
-                <div className="w-14 h-14 rounded-2xl bg-brand-deepblue/5 text-brand-accent flex items-center justify-center mb-6">
-                  {audience.icon}
-                </div>
-                <div className="text-xs font-bold uppercase tracking-widest text-brand-muted mb-3">{audience.label}</div>
-                <h3 className="text-2xl font-bold mb-6 leading-snug">{audience.headline}</h3>
-                <ul className="space-y-3 mb-8 flex-grow">
-                  {audience.points.map((pt, j) => (
-                    <li key={j} className="flex items-start gap-3 text-sm text-brand-muted">
-                      <CheckCircle className="w-4 h-4 text-brand-accent flex-shrink-0 mt-0.5" />
-                      {pt}
-                    </li>
-                  ))}
-                </ul>
+                <div className="text-4xl mb-6">{audience.emoji}</div>
+                <h3 className="text-2xl font-bold mb-4">{audience.title}</h3>
+                <p className="text-brand-muted leading-relaxed flex-grow mb-8">{audience.desc}</p>
                 <button
                   onClick={() => onNavigate(audience.page)}
-                  className="w-full py-4 rounded-xl bg-brand-deepblue text-white font-bold hover:bg-brand-blue transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-xl bg-brand-deepblue text-white font-bold hover:bg-brand-blue transition-all flex items-center justify-center gap-2 group"
                 >
-                  {audience.cta} <ArrowRight className="w-4 h-4" />
+                  {audience.cta}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </motion.div>
             ))}
@@ -516,8 +478,8 @@ export default function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
 
-      {/* ── FOUNDER SECTION ── */}
-      <section className="py-32 bg-brand-deepblue overflow-hidden">
+      {/* ── FOUNDER ── */}
+      <section className="py-32 lg:py-40 bg-brand-deepblue overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-20 items-start">
             <div className="w-full lg:w-5/12 lg:sticky lg:top-32">
@@ -535,7 +497,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 />
                 <div className="absolute -bottom-6 -right-6 bg-brand-accent p-6 rounded-2xl shadow-2xl">
                   <div className="text-brand-deepblue font-bold text-lg leading-tight">
-                    Aline Cristina de Souza<br/>
+                    Aline Cristina de Souza<br />
                     <span className="text-sm opacity-80 font-medium">Founder & CEO</span>
                   </div>
                 </div>
@@ -550,34 +512,28 @@ export default function Home({ onNavigate }: HomeProps) {
                 transition={{ duration: 0.6 }}
               >
                 <h2 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-                  Architect of <span className="text-brand-accent italic">Productive Inclusion.</span>
+                  Architect of{' '}
+                  <span className="text-brand-accent italic">Productive Inclusion.</span>
                 </h2>
                 <p className="text-xl text-white/70 mb-12 leading-relaxed italic">
-                  "My mission is to transform corporate structures into ecosystems of high performance and social impact, bridging the gap between exact sciences and behavioral depth."
+                  "My mission is to transform corporate structures into ecosystems of high performance
+                  and social impact, bridging the gap between exact sciences and behavioral depth."
                 </p>
 
                 <div className="space-y-10">
                   <div>
                     <h3 className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-4">Academic Foundation</h3>
                     <p className="text-white/80 leading-relaxed">
-                      Master's degree in Regional Development (UNIFACEF) and MBA in Controllership and Finance (USP).
-                      Background in Mathematics, fortified by executive specializations in Labor Law and Organizational Psychology.
+                      Master's degree in Regional Development (UNIFACEF) and MBA in Controllership and
+                      Finance (USP). Background in Mathematics, fortified by specializations in Labor Law
+                      and Organizational Psychology.
                     </p>
                   </div>
                   <div className="space-y-6">
                     {[
-                      {
-                        title: 'Institutional Leadership (National Scale)',
-                        desc: 'Led large-scale projects at the Brazilian Paralympic Committee generating almost 1,000 direct jobs for vulnerable populations, aligning inclusion with technical performance.',
-                      },
-                      {
-                        title: 'Operational Excellence (U.S. Brands)',
-                        desc: 'Guided global operations managing strategic units for McDonald\'s and Burger King, executing controllership and budgetary efficiency.',
-                      },
-                      {
-                        title: 'Proprietary IP Creator',
-                        desc: 'Developer of the SME Resilience Toolkit™, providing the blueprint for resilient organizational continuity through 10 unique proprietary indices.',
-                      },
+                      { title: 'Institutional Leadership at National Scale', desc: 'Led large-scale projects at the Brazilian Paralympic Committee generating nearly 1,000 direct jobs for vulnerable populations — aligning social inclusion with technical performance.' },
+                      { title: 'Operational Excellence with U.S. Brands', desc: 'Guided strategic operations for McDonald\'s and Burger King, executing controllership and budgetary efficiency across international markets.' },
+                      { title: 'Proprietary Methodology Creator', desc: 'Developer of the SME Resilience Toolkit™ — the first proprietary system designed exclusively for organizational resilience in the U.S. SME segment.' },
                     ].map((item, i) => (
                       <div key={i} className="border-l-2 border-brand-accent/30 pl-6">
                         <h4 className="font-bold text-lg mb-2">{item.title}</h4>
@@ -592,36 +548,35 @@ export default function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
 
-      {/* ── DUAL CTA ── */}
-      <section className="py-32 bg-brand-accent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-widest mb-6">
-            <Zap className="w-3.5 h-3.5" />
-            Limited Cohort Seats Available
-          </div>
-          <h2 className="text-5xl lg:text-7xl font-bold mb-8 tracking-tighter">
-            PROFIT THROUGH<br/>GOVERNANCE.
-          </h2>
-          <p className="text-2xl mb-4 max-w-3xl mx-auto font-medium opacity-90">
-            The SME Resilience Academy™ is the only place in the United States where you can acquire
-            a science-backed, financially defensible, proprietary methodology for SME organizational resilience.
-          </p>
-          <p className="text-lg mb-12 opacity-70">Use it immediately to charge premium fees and deliver documented client ROI.</p>
-          <div className="flex flex-col md:flex-row justify-center gap-6">
-            <button
-              onClick={() => onNavigate('pricing')}
-              className="bg-brand-deepblue text-white px-12 py-6 rounded-full font-bold text-xl hover:scale-105 transition-transform shadow-2xl"
-            >
-              View Certification Pricing
-            </button>
+      {/* ── FINAL CTA ── */}
+      <section className="py-32 lg:py-40 bg-brand-offwhite">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-6">Ready?</div>
+            <h2 className="text-5xl lg:text-7xl font-bold mb-8 leading-tight text-brand-deepblue">
+              Stop selling hours.<br />
+              <span className="text-brand-accent italic">Start delivering a score.</span>
+            </h2>
+            <p className="text-xl text-brand-muted mb-12 leading-relaxed">
+              Book a discovery call with an SME Resilience Academy™ advisor.
+              We'll identify the right certification level for your goals and
+              walk you through what the methodology looks like in practice.
+            </p>
             <button
               onClick={() => onNavigate('contact')}
-              className="bg-white text-brand-deepblue px-12 py-6 rounded-full font-bold text-xl hover:scale-105 transition-transform shadow-2xl"
+              className="bg-brand-accent text-white px-14 py-6 rounded-full font-bold text-xl hover:scale-105 transition-transform shadow-2xl shadow-brand-accent/30 inline-flex items-center gap-3"
             >
-              Book a Discovery Call
+              Book Your Discovery Call
+              <ArrowRight className="w-6 h-6" />
             </button>
-          </div>
-          <p className="text-sm mt-8 opacity-60">7-day full refund guarantee if you don't see the methodology's power after Module 1.</p>
+            <p className="text-sm text-brand-muted mt-6 opacity-70">
+              No commitment. No pitch. Just a conversation about where you are and where the Toolkit can take you.
+            </p>
+          </motion.div>
         </div>
       </section>
 
