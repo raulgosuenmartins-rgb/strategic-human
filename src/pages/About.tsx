@@ -34,15 +34,11 @@ export default function About() {
                 transition={{ duration: 0.7, delay: 0.1 }}
                 className="relative"
               >
-                {/* Placeholder avatar — to be replaced with professional photo */}
-                <div className="w-full aspect-[3/4] bg-brand-warm border border-brand-border rounded flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-24 h-24 rounded-full bg-brand-navy/10 flex items-center justify-center mx-auto mb-4">
-                      <span className="font-display text-3xl font-semibold text-brand-navy/40">ACS</span>
-                    </div>
-                    <p className="text-xs text-brand-muted uppercase tracking-widest">Photo coming soon</p>
-                  </div>
-                </div>
+                <img
+                  src="/founder.png"
+                  alt="Aline Cristina de Souza — Founder and CEO, Strategic Human Systems & Governance LLC"
+                  className="w-full rounded object-cover object-top"
+                />
 
                 {/* Name card */}
                 <div className="mt-5 p-5 border border-brand-border rounded bg-white">
