@@ -1,11 +1,11 @@
-export type Page = 'home' | 'methodology' | 'certification' | 'consultants' | 'companies' | 'faq' | 'contact' | 'pricing';
+export type Page = 'home' | 'about' | 'methodology' | 'services' | 'contact';
 
-export interface LeadData {
-  name: string;
+export interface ContactFormData {
+  fullName: string;
+  companyName: string;
+  industry: string;
+  employeeCount: string;
+  annualRevenue: string;
+  subject: string;
   email: string;
-  company: string;
-  role: string;
-  country: string;
-  interestType: 'individual' | 'consultancy' | 'company' | 'institution' | 'partnership';
-  context: string;
 }

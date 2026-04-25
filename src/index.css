@@ -1,46 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
 
-  --color-brand-offwhite: #FDFCFB;
-  --color-brand-deepblue: #0A192F;
-  --color-brand-blue: #112240;
-  --color-brand-accent: #FF6B6B; /* Sophisticated Coral */
-  --color-brand-muted: #64748B;
+  /* Primary: Navy blue */
+  --color-brand-navy: #1B3A5C;
+  --color-brand-navy-deep: #122840;
+  --color-brand-navy-light: #234d7a;
+
+  /* Accent: dark teal */
+  --color-brand-teal: #1E5F74;
+
+  /* Neutrals */
+  --color-brand-offwhite: #F8F7F5;
+  --color-brand-warm: #F2F0EC;
+  --color-brand-muted: #6B7280;
+  --color-brand-border: #E4E1DC;
+
+  /* Legacy aliases for compatibility during transition */
+  --color-brand-deepblue: #1B3A5C;
+  --color-brand-blue: #122840;
+  --color-brand-accent: #1E5F74;
 }
 
 @layer base {
   body {
-    @apply bg-brand-offwhite text-brand-deepblue font-sans antialiased;
+    @apply bg-brand-offwhite text-brand-navy font-sans antialiased;
   }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight;
+  h1, h2, h3 {
+    @apply font-display;
   }
-}
-
-.editorial-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 1.5rem;
-}
-
-.glass-card {
-  @apply bg-white/80 backdrop-blur-md border border-brand-deepblue/5 shadow-sm;
 }
 
 .hero-gradient {
-  background: linear-gradient(135deg, #FDFCFB 0%, #f5f3f0 50%, #eef2f8 100%);
+  background: linear-gradient(160deg, #F8F7F5 0%, #EFF4F8 60%, #E8EFF6 100%);
 }
 
-@keyframes shimmer-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.04; }
-  33% { transform: translate(20px, -15px) scale(1.05); opacity: 0.07; }
-  66% { transform: translate(-10px, 20px) scale(0.98); opacity: 0.05; }
-}
-
-.bg-animated-orb {
-  animation: shimmer-drift 12s ease-in-out infinite;
+.section-navy {
+  background-color: #1B3A5C;
 }

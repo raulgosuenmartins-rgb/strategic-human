@@ -1,56 +1,44 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Page } from './types';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import About from './pages/About';
 import Methodology from './pages/Methodology';
-import Certification from './pages/Certification';
-import Consultants from './pages/Consultants';
-import Companies from './pages/Companies';
-import FAQ from './pages/FAQ';
+import Services from './pages/Services';
 import Contact from './pages/Contact';
-import Pricing from './pages/Pricing';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
 
-  // Scroll to top on page change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPage]);
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home': return <Home onNavigate={setCurrentPage} />;
+      case 'home':        return <Home onNavigate={setCurrentPage} />;
+      case 'about':       return <About />;
       case 'methodology': return <Methodology onNavigate={setCurrentPage} />;
-      case 'certification': return <Certification onNavigate={setCurrentPage} />;
-      case 'consultants': return <Consultants />;
-      case 'companies': return <Companies />;
-      case 'faq': return <FAQ />;
-      case 'contact': return <Contact />;
-      case 'pricing': return <Pricing onNavigate={setCurrentPage} />;
-      default: return <Home onNavigate={setCurrentPage} />;
+      case 'services':    return <Services onNavigate={setCurrentPage} />;
+      case 'contact':     return <Contact />;
+      default:            return <Home onNavigate={setCurrentPage} />;
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar currentPage={currentPage} onNavigate={setCurrentPage} />
-      
+
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
           >
             {renderPage()}
           </motion.div>
